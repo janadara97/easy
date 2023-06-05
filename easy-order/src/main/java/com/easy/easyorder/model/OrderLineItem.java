@@ -1,0 +1,21 @@
+package com.easy.easyorder.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "t_order_line_item")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Data
+public class OrderLineItem {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String skuCode;
+    private BigDecimal price;
+    private Integer quantity;
+}
