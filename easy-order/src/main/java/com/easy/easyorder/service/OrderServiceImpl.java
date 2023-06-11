@@ -22,7 +22,7 @@ public class OrderServiceImpl implements OrderService {
     OrderRepository orderRepository;
 
     @Autowired
-    WebClient webClient;
+    WebClient.Builder webClientBuilder;
     @Override
     public ResponseEntity<Object> createOrder(OrderRequest orderRequest) {
         try{
@@ -36,8 +36,8 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderLineItems(orderLineItemList);
             List<String> skuCodes = order.getOrderLineItems().stream().map(OrderLineItem::getSkuCode).collect(Collectors.toList());
             //check the availability of the stock by calling to the inventory service
-            InventoryResponseDto[] inventoryResponse = webClient.get()
-                            .uri("http://localhost:8082/api/inventory/isInStock",
+            InventoryResponseDto[] inventoryResponse = webClientBuilder.build().get()
+                            .uri("http://easy-inventory/api/inventory/isInStock",
                                     uriBuilder -> uriBuilder.queryParam("skuCode",skuCodes).build())
                                     .retrieve()
                                             .bodyToMono(InventoryResponseDto[].class)
