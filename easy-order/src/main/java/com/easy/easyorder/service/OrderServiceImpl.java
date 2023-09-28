@@ -1,15 +1,18 @@
 package com.easy.easyorder.service;
 
+import com.easy.easyorder.events.OrderPlacedEvent;
 import com.easy.easyorder.model.Order;
 import com.easy.easyorder.model.OrderLineItem;
 import com.easy.easyorder.model.dto.InventoryResponseDto;
 import com.easy.easyorder.model.dto.OrderRequest;
 import com.easy.easyorder.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.sleuth.Span;
 import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -18,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 @Service
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -28,6 +32,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     Tracer tracer;
+
+    private final KafkaTemplate<String,OrderPlacedEvent> kafkaTemplate;
 
     @Override
     public ResponseEntity<Object> createOrder(OrderRequest orderRequest) {
@@ -57,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if(Boolean.TRUE.equals(allProductsInStock)) {
                     orderRepository.save(order);
+                    kafkaTemplate.send("notificationTopic",new OrderPlacedEvent(order.getOrderNumber()));
                 }
                 else {
                     throw new IllegalArgumentException("Product is not in stock");
