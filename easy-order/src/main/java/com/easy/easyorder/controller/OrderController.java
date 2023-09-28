@@ -3,6 +3,8 @@ package com.easy.easyorder.controller;
 import com.easy.easyorder.model.dto.OrderRequest;
 import com.easy.easyorder.service.OrderService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +21,13 @@ public class OrderController {
     OrderService orderService;
     @PostMapping("/create")
     @CircuitBreaker(name = "inventory" , fallbackMethod = "fallBackMethod")
+    //@TimeLimiter(name = "inventory")
+    @Retry(name = "inventory")  
     public ResponseEntity<Object> createOrder(@RequestBody OrderRequest orderRequest){
         return orderService.createOrder(orderRequest);
     }
 
     public ResponseEntity<Object> fallBackMethod(OrderRequest orderRequest,RuntimeException runtimeException) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed inventory");
     }
 }
