@@ -7,6 +7,9 @@
         <option value="$PROJECT_DIR$/easy-product/pom.xml" />
         <option value="$PROJECT_DIR$/easy-order/pom.xml" />
         <option value="$PROJECT_DIR$/easy-inventory/pom.xml" />
+        <option value="$PROJECT_DIR$/service-discovery/pom.xml" />
+        <option value="$PROJECT_DIR$/easy-notification/pom.xml" />
+        <option value="$PROJECT_DIR$/api-gateway/pom.xml" />
       </list>
     </option>
   </component>
